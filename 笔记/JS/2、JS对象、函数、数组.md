@@ -17,7 +17,7 @@ var obj={}；
 ##### 原型对象创建
 
 ```
-var obj=Object.create({});//以后讲
+var obj=Object.create({});
     Object.create(proto, [ propertiesObject ])
     proto对象原型
     propertiesObject 一组属性和值，该参数对象不能是 undefined，另外只有该对象中自身拥有的可枚举的属性才有效，也就是说该对象的原型链上属性是无效的。
@@ -1754,7 +1754,47 @@ var arr1=arr.splice(1,0,0);
 ​		splice重构
 
 ```
-
+function splice(arr, start, length) {
+    if (start === undefined) start = 0;
+    if (length === undefined) length = 0;
+    start = Number(start);
+    length = Number(length);
+    var argumentsNum = arguments.length - 3;
+    var delArr = [];
+    //如果start为负数
+    if (start < 0) start = arr.length + start;
+    //如果length为复数
+    if (length < 0) length = 0;
+    //如果start大于数组长度，则向尾部插入
+    if (arr.length <= start) {
+        for (var i = 3; i < arguments.length; i++) {
+            arr[arr.length] = arguments[i];
+        }
+    }
+    //将从start开始length长度的元素赋值给delarr，并将arr元素前移
+    for (i = 0; i < arr.length - start; i++) {
+        if (i < length) {
+            delArr[i] = arr[i + start];
+        }
+        arr[i + start] = arr[i + start + length];
+    }
+    //删除多余的长度
+    arr.length -= length;
+    //如果存在插入的参数
+    if (argumentsNum >= 0) {
+        arr.length += argumentsNum;
+        //循环后移
+        for (j = arr.length - 1; j >= start; j--) {
+            arr[j] = arr[j - argumentsNum];
+        }
+        console.log(arr);
+        //插入参数
+        for (k = 0; k < argumentsNum; k++) {
+            arr[k + start] = arguments[k + 3];
+        }
+    }
+    return delArr;
+}
 ```
 
 ##### reverse()
@@ -2524,7 +2564,25 @@ console.log(arr1);
 ​		扁平化数组重构
 
 ```
+function flatMap(arr,fn){
+    var arr1=[];
+    for(var i=0;i<arr.length;i++){
+        if(Array.isArray(fn(arr[i],i,arr))){
+            for(j=0;j<arr[i].length;j++){
+                arr1.push(arr[i][j]);
+            }
+        }else{
+            arr1.push(arr[i]);
+        }
+    }
+    return arr1;
+}
 
+var arr=[0,"我",[1,2,3],[4,5,6],[7,8,9]];
+var arr1=flatMap(arr,function(item,index,arr){
+    return item;//返回数组中的数组
+})
+console.log(arr1);
 ```
 
 
